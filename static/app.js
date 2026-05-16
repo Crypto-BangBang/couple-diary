@@ -1,3 +1,37 @@
+// ── 서비스 워커 & 알림 ────────────────────────────────
+let swReg = null;
+
+if ('serviceWorker' in navigator && 'PushManager' in window) {
+    navigator.serviceWorker.register('/static/sw.js')
+        .then(reg => { swReg = reg; });
+}
+
+async function subscribeNotifications() {
+    if (!swReg || !user) return;
+    try {
+        const permission = await Notification.requestPermission();
+        if (permission !== 'granted') return;
+        const res = await fetch('/vapid-public-key');
+        const { key } = await res.json();
+        if (!key) return;
+        const sub = await swReg.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: urlB64ToUint8(key)
+        });
+        await fetch('/subscribe', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ author: user.name, subscription: sub })
+        });
+    } catch(e) { console.log('알림 구독 실패:', e); }
+}
+
+function urlB64ToUint8(b64) {
+    const pad = '='.repeat((4 - b64.length % 4) % 4);
+    const raw = atob((b64 + pad).replace(/-/g, '+').replace(/_/g, '/'));
+    return new Uint8Array([...raw].map(c => c.charCodeAt(0)));
+}
+
 // ── 상태 ──────────────────────────────────────────────
 let user         = null;
 let names        = { me: '남자친구', her: '여자친구' };
@@ -93,6 +127,7 @@ function switchUser() {
 
 // ── 섹션 화면 ─────────────────────────────────────────
 function goToSection() {
+  subscribeNotifications();
   document.getElementById('greeting-text').textContent = `${user.name}님 ♡`;
   document.getElementById('sec-me-name').textContent   = `${names.me}의 다이어리`;
   document.getElementById('sec-her-name').textContent  = `${names.her}의 다이어리`;
