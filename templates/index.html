@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>우리의 다이어리</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+  <div class="clouds">
+    <div class="cloud c1"></div>
+    <div class="cloud c2"></div>
+    <div class="cloud c3"></div>
+    <div class="cloud c4"></div>
+  </div>
+
+  <!-- 커버 화면 -->
+  <div id="cover-screen">
+    <div class="cover-title">우리의 다이어리</div>
+    <div class="cover-sub">소중한 순간들을 담아요</div>
+    <div class="diary-wrap" onclick="openDiary()">
+      <div class="diary-book" id="diary-book">
+        <div class="diary-front">
+          <div class="diary-front-inner">
+            <div class="diary-heart">♡</div>
+            <div class="diary-label">Our Diary</div>
+            <div class="diary-hint">눌러서 열기</div>
+          </div>
+        </div>
+        <div class="diary-back"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 다이어리 프레임 -->
+  <div id="diary-app">
+    <div class="diary-frame">
+      <div class="diary-spine"></div>
+      <div class="diary-inner">
+
+        <!-- 페이지 1: 이름 설정 -->
+        <div class="dpage" id="page-name">
+          <div class="dpage-header">
+            <span class="dpage-title">처음 오셨군요</span>
+          </div>
+          <div class="dpage-body center-content">
+            <div class="heart-deco">♡</div>
+            <p class="name-guide">나는 누구인가요?</p>
+            <p class="name-sub">한 번만 설정하면 돼요</p>
+            <div class="name-inputs">
+              <input id="input-me"  type="text" placeholder="남자친구 이름" maxlength="8">
+              <input id="input-her" type="text" placeholder="여자친구 이름" maxlength="8">
+            </div>
+            <div class="name-btns">
+              <button class="name-btn me-btn"  onclick="setUser('me')">남자친구예요</button>
+              <button class="name-btn her-btn" onclick="setUser('her')">여자친구예요</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 페이지 2: 섹션 선택 -->
+        <div class="dpage" id="page-section">
+          <div class="dpage-header">
+            <button class="ghost-btn" onclick="switchUser()">전환</button>
+            <span class="dpage-title" id="greeting-text">안녕하세요</span>
+            <span></span>
+          </div>
+          <div class="dpage-body">
+            <div class="section-list">
+              <div class="sec-item me-item" onclick="selectSection('me')">
+                <div class="sec-tab me-tab"></div>
+                <div class="sec-content">
+                  <div class="sec-name" id="sec-me-name">내 다이어리</div>
+                  <div class="sec-desc">나만의 기록</div>
+                </div>
+                <div class="sec-arrow">›</div>
+              </div>
+              <div class="sec-item her-item" onclick="selectSection('her')">
+                <div class="sec-tab her-tab"></div>
+                <div class="sec-content">
+                  <div class="sec-name" id="sec-her-name">여자친구 다이어리</div>
+                  <div class="sec-desc">그녀의 기록</div>
+                </div>
+                <div class="sec-arrow">›</div>
+              </div>
+              <div class="sec-item us-item" onclick="selectSection('us')">
+                <div class="sec-tab us-tab"></div>
+                <div class="sec-content">
+                  <div class="sec-name">우리 다이어리</div>
+                  <div class="sec-desc">함께하는 기록</div>
+                </div>
+                <div class="sec-arrow">›</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 페이지 3: 캘린더 -->
+        <div class="dpage" id="page-calendar">
+          <div class="dpage-header">
+            <button class="ghost-btn" onclick="goBack('page-section')">←</button>
+            <span class="dpage-title" id="cal-title">다이어리</span>
+            <button class="ghost-btn write-ghost" id="cal-write-btn" onclick="showWrite(null)">+</button>
+          </div>
+          <div class="dpage-body">
+            <div class="cal-nav">
+              <button class="cal-arrow" onclick="changeMonth(-1)">‹</button>
+              <span id="cal-month-label"></span>
+              <button class="cal-arrow" onclick="changeMonth(1)">›</button>
+            </div>
+            <div class="cal-weekdays">
+              <span class="sun">일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span class="sat">토</span>
+            </div>
+            <div id="cal-grid" class="cal-grid"></div>
+            <p class="cal-hint" id="cal-hint">날짜를 선택하세요</p>
+          </div>
+        </div>
+
+        <!-- 페이지 4: 날짜별 목록 -->
+        <div class="dpage" id="page-entries">
+          <div class="dpage-header">
+            <button class="ghost-btn" onclick="goBack('page-calendar')">←</button>
+            <span class="dpage-title" id="entries-date-title">5월 16일</span>
+            <button class="ghost-btn write-ghost" id="entries-write-btn" onclick="showWrite(null)">+</button>
+          </div>
+          <div class="dpage-body scrollable">
+            <div id="entries-list"></div>
+          </div>
+        </div>
+
+        <!-- 페이지 5: 글 상세 -->
+        <div class="dpage" id="page-detail">
+          <div class="dpage-header">
+            <button class="ghost-btn" onclick="goBack('page-entries')">←</button>
+            <span class="dpage-title">기록</span>
+            <button class="ghost-btn" id="edit-btn" onclick="editCurrentEntry()">편집</button>
+          </div>
+          <div class="dpage-body scrollable">
+            <div id="entry-detail"></div>
+            <div class="comments-wrap">
+              <div class="comments-label">댓글</div>
+              <div id="comments-list"></div>
+              <div class="comment-form">
+                <input id="comment-input" type="text" placeholder="댓글 입력...">
+                <button onclick="submitComment()">등록</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 페이지 6: 글쓰기/편집 -->
+        <div class="dpage" id="page-write">
+          <div class="dpage-header">
+            <button class="ghost-btn" onclick="cancelWrite()">←</button>
+            <span class="dpage-title" id="write-title">새 기록</span>
+            <button class="ghost-btn save-ghost" onclick="saveEntry()">저장</button>
+          </div>
+          <div class="dpage-body scrollable">
+            <input type="text" id="w-title" class="w-title" placeholder="제목">
+            <div class="w-meta">
+              <input type="datetime-local" id="w-date" class="w-meta-input">
+              <input type="text" id="w-location" class="w-meta-input" placeholder="장소">
+            </div>
+            <div class="photo-area" id="photo-area" onclick="document.getElementById('w-photo').click()">
+              <div id="photo-preview">
+                <span class="photo-plus">+</span>
+                <span>사진 추가</span>
+              </div>
+              <input type="file" id="w-photo" accept="image/*" style="display:none" onchange="previewPhoto(this)">
+            </div>
+            <div class="lined-wrap">
+              <textarea id="w-content" class="w-content" placeholder="오늘의 이야기를 적어요..."></textarea>
+            </div>
+            <button class="del-btn" id="del-btn" onclick="deleteCurrentEntry()" style="display:none">기록 삭제</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
